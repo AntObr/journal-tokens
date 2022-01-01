@@ -11,5 +11,10 @@
     "minimumCoreVersion": "0.8.8",
     "esmodules": [
         "module/main.mjs"
+    ],
+    "dependencies": [
+      {
+        "name": "lib-wrapper"
+      }
     ]
   }
