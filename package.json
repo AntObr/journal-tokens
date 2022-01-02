@@ -1,0 +1,15 @@
+{
+  "name": "journal-tokens",
+  "version": "1.0.0",
+  "description": "Display Journal Entries as Tokens",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/AnthonyRO/journal-tokens.git"
+  },
+  "dependencies": {
+    "@pixi/text-html": "^2.0.0"
+  }
+}

@@ -1,10 +1,9 @@
 import { Config } from "./config.mjs";
+// import  { HTMLText } from "@pixi/text-html";
 // CONFIG.debug.hooks = true;
 console.log("journal-tokens | Hello, World!");
 
-import {get} from
-
-var defaultActor = null;
+let defaultActor = null;
 
 class JTActor extends Actor {}
 
@@ -24,7 +23,7 @@ class JTManager {
         if (defaultActor === null) {
             getOrCreateDefaultActor();
         }
-        const td = await defaultActor.getTokenData({name: "journal-tokens-token", img: "https://via.placeholder.com/150"});
+        const td = await defaultActor.getTokenData({name: "journal-tokens-token", img: "modules/journal-tokens/assets/1x1.png"});
         console.log(td);
         const docClass = getDocumentClass("Token");
         const token = await docClass.create(td, {parent: canvas.scene});
@@ -80,7 +79,7 @@ class JTManager {
 
 async function createJT(journalEntry) {
     const jt = await JTManager.new(journalEntry);
-    JTManager.getToken(jt).document.update({name: jt.name, displayName: 50});
+    JTManager.getToken(jt).document.update({name: jt.name}); // , displayName: 50});
 }
 
 Hooks.on("getJournalDirectoryEntryContext", (_html, contextEntries) => {
@@ -124,10 +123,6 @@ async function handleUpdateJournalEntry(journalEntry, change, options, userId) {
 
 Hooks.on("updateJournalEntry", handleUpdateJournalEntry);
 
-function processHTMLTags(htmlString) {
-    return htmlString.replaceAll(/<\/?[^>]*>/gm, htmlstring);
-}
-
 function getJournalTokenIcon(
     name,
     content,
@@ -160,7 +155,7 @@ function getJournalTokenIcon(
     graphics.drawRect(0, 0, width, height);
     graphics.endFill();
 
-    let text = new PIXI.Text(processHTMLTags(name) ,{fontFamily : 'Arial', fontSize: 20, fill : 0x000000, align : 'left', wordWrap: true, wordWrapWidth: contentWidth});
+    let text = new PIXI.Text(name ,{fontFamily : 'Arial', fontSize: 20, fill : 0x000000, align : 'left', wordWrap: true, wordWrapWidth: contentWidth});
 
     text.setTransform(leftMargin, 0);
 
@@ -175,7 +170,7 @@ function getJournalTokenIcon(
     console.log(line);
     graphics.addChild(line);
 
-    let text2 = new PIXI.Text(processHTMLTags(content) ,{fontFamily : 'Arial', fontSize: 16, fill : 0x000000, align : 'left', wordWrap: true, wordWrapWidth: contentWidth});
+    let text2 = new PIXI.Text(content ,{fontFamily : 'Arial', fontSize: 16, fill : 0x000000, align : 'left', wordWrap: true, wordWrapWidth: contentWidth});
 
     text2.setTransform(leftMargin, text.getLocalBounds().height+dividerThickness);
 
@@ -284,6 +279,8 @@ Hooks.once("libWrapper.Ready", () => {
         const jt = JTManager.getByTokenID(this.id);
         let result = wrapped(...args);
         console.log(jt);
+        console.log(this);
+        console.log(defaultActor);
         if (jt) {
             // this.icon.clear();
             let graphics = getJournalTokenIcon(jt.name, jt.content, this.w, this.h);

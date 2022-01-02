@@ -1,0 +1,1 @@
+import  { HTMLText } from "@pixi/text-html";
