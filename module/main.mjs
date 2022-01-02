@@ -1,7 +1,5 @@
 import { Config } from "./config.mjs";
-// import  { HTMLText } from "@pixi/text-html";
-// CONFIG.debug.hooks = true;
-console.log("journal-tokens | Hello, World!");
+import { HTMLText } from "../node_modules/@pixi/text-html/dist/html-text.es.js";
 
 let defaultActor = null;
 
@@ -24,10 +22,8 @@ class JTManager {
             getOrCreateDefaultActor();
         }
         const td = await defaultActor.getTokenData({name: "journal-tokens-token", img: "modules/journal-tokens/assets/1x1.png"});
-        console.log(td);
         const docClass = getDocumentClass("Token");
         const token = await docClass.create(td, {parent: canvas.scene});
-        console.log()
         const jt = {
             id: foundry.utils.randomID(16),
             journalId: journalEntry.id,
@@ -116,8 +112,8 @@ async function handleUpdateJournalEntry(journalEntry, change, options, userId) {
             name: change.name||journalEntry.data.name,
             content: change.content||journalEntry.data.content
         };
-        await JTManager.update(jt, update); //{name: journalEntry.data.name});
-        JTManager.getToken(jt).document.update(update); //{name: change.name, displayName: 50});
+        await JTManager.update(jt, update);
+        JTManager.getToken(jt).document.update(update);
     }
 }
 
@@ -135,7 +131,6 @@ function getJournalTokenIcon(
     dividerColor = 0x000000,
     dividerThickness = 2
 ) {
-    console.log(`Creating a token icon with `)
     if (margin === null) {
         margin = width / 10;
     }
@@ -155,6 +150,7 @@ function getJournalTokenIcon(
     graphics.drawRect(0, 0, width, height);
     graphics.endFill();
 
+    // Name/Title
     let text = new PIXI.Text(name ,{fontFamily : 'Arial', fontSize: 20, fill : 0x000000, align : 'left', wordWrap: true, wordWrapWidth: contentWidth});
 
     text.setTransform(leftMargin, 0);
@@ -167,12 +163,18 @@ function getJournalTokenIcon(
     line.drawRect(0, 0, contentWidth, dividerThickness);
     line.endFill();
     line.setTransform(leftMargin, text.getLocalBounds().height);
-    console.log(line);
     graphics.addChild(line);
 
-    let text2 = new PIXI.Text(content ,{fontFamily : 'Arial', fontSize: 16, fill : 0x000000, align : 'left', wordWrap: true, wordWrapWidth: contentWidth});
+    // Content
+    const style = new PIXI.TextStyle({
+        fontSize: 16,
+        align: 'left',
+        wordWrap: true,
+        wordWrapWidth: contentWidth
+    });
+    let text2 = new HTMLText(content, style);
 
-    text2.setTransform(leftMargin, text.getLocalBounds().height+dividerThickness);
+    text2.setTransform(leftMargin, text.getLocalBounds().height + dividerThickness);
 
     graphics.addChild(text2);
 
@@ -187,89 +189,20 @@ function getJournalTokenIcon(
     return graphics;
 }
 
-// Hooks.once("libWrapper.Ready", () => {
-//     console.log("###################################");
-//     console.log("attempting register");
-// 	if (!game.modules.get('lib-wrapper')?.active) {
-// 		if (game.user.isGM) {
-// 			ui.notifications.error("Module journal-tokens requires the 'libWrapper' module. Please install and activate it.");
-// 		}
-// 		return;
-// 	}
-//     libWrapper.register(Config.ID, 'Token.prototype._drawIcon', async function (wrapped, ...args) {
-//             console.log('Token.prototype._drawIcon was called');
-//             console.log(this);
-//             const jt = JTManager.getByTokenID(this.id);
-//             console.log(jt);
-//             if (jt) {
-//                 console.log("RENDERING ICON AS JOURNAL TOKEN");
-//                 let graphics = getJournalTokenIcon(jt.name, jt.content, this.w, this.h);
-//                 graphics.tint = this.data.tint ? foundry.utils.colorStringToHex(this.data.tint) : 0xFFFFFF;
-//                 graphics.setTransform(0, 0);
-//                 return graphics;
-//                 // console.log(icon);
-//                 // return icon;
-//             }
-//             else {
-//                 let result = wrapped(...args);
-//                 return result;
-//             }
-//         },
-//         'MIXED'
-//     );
-
-//     libWrapper.register(Config.ID, 'Token.prototype.refresh', async function (wrapped, ...args) {
-//         console.log('Token.prototype.refresh was called');
-//             console.log(this);
-//             const jt = JTManager.getByTokenID(this.id);
-//             console.log(jt);
-//             if (jt) {
-//                 console.log("RENDERING AS JOURNAL TOKENS");
-//                 console.log(this);
-//                 let graphics = getJournalTokenIcon(jt.name, jt.content, this.w, this.h);
-//                 this.icon = graphics;
-//                 console.log(this.icon);
-//                 return this
-//                 // this.icon.removeChild(...this.icon.children);
-//                 // graphics.children.forEach((child) => {
-//                 //     this.icon.addChild(child);
-//                 // });
-//                 // this.icon.beginFill(0xFF0000);
-//                 // this.icon.drawRect(0, 0, this.w, this.h);
-//                 // this.icon.endFill();
-//                 // let jtString = jt.name + jt.content;
-//                 // let text = new PIXI.Text(jtString ,{fontFamily : 'Arial', fontSize: 24, fill : 0x000000, align : 'center', wordWrap: true, wordWrapWidth: this.w});
-//                 // console.log(text);
-//                 // this.icon.addChild(text);
-//                 // this.icon.tint = this.data.tint ? foundry.utils.colorStringToHex(this.data.tint) : 0xFFFFFF;
-//                 // console.log("###################################");
-//                 // console.log("###################################");
-//                 // console.log("###################################");
-//                 // this.setTransform(0, 0, this.scale.x, this.scale.y, this.rotation, this.skew.x, this.skew.y, 0.5, 0.5);
-//                 // console.log(this.icon);
-//             }
-//             let result = wrapped(...args);
-//             return result;
-//     }, 'MIXED');
-// });
-
 Hooks.once("libWrapper.Ready", () => {
 	if (!game.modules.get('lib-wrapper')?.active) {
 		if (game.user.isGM) {
-			ui.notifications.error("Module journal-tokens requires the 'libWrapper' module. Please install and activate it.");
+			ui.notifications.error("Module 'journal-tokens' requires the 'libWrapper' module. Please install and activate it.");
 		}
 		return;
 	}
     libWrapper.register(Config.ID, 'Token.prototype._drawIcon', async function (wrapped, ...args) {
         const jt = JTManager.getByTokenID(this.id);
-        console.log(this);
-        console.log(jt);
         if (jt) {
             let icon = new PIXI.Container();
-            console.log(icon);
             let graphics = getJournalTokenIcon(jt.title, jt.content, this.w, this.h);
+            graphics.tint = this.data.tint ? foundry.utils.colorStringToHex(this.data.tint) : 0xFFFFFF;
             icon.addChild(graphics);
-            // icon.setTransform(0, 0);
             return icon;
         }
         return wrapped(...args)
@@ -278,16 +211,12 @@ Hooks.once("libWrapper.Ready", () => {
     libWrapper.register(Config.ID, 'Token.prototype.refresh', async function (wrapped, ...args) {
         const jt = JTManager.getByTokenID(this.id);
         let result = wrapped(...args);
-        console.log(jt);
-        console.log(this);
-        console.log(defaultActor);
         if (jt) {
-            // this.icon.clear();
             let graphics = getJournalTokenIcon(jt.name, jt.content, this.w, this.h);
+            graphics.tint = this.data.tint ? foundry.utils.colorStringToHex(this.data.tint) : 0xFFFFFF;
             this.icon.removeChild(...this.icon.children);
             this.icon.addChild(graphics);
             this.icon.setTransform(0, 0);
-            console.log(this);
         }
         return result
     }, 'MIXED');

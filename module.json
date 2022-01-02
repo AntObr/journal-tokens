@@ -10,7 +10,7 @@
     "version": "1",
     "minimumCoreVersion": "0.8.8",
     "esmodules": [
-        "module/main.mjs"
+        "dist/journal-tokens.js"
     ],
     "dependencies": [
       {
