@@ -9,7 +9,7 @@ class JTActor extends Actor {}
 
 function getOrCreateDefaultActor() {
     if (!defaultActor) {
-        defaultActor = new JTActor({name: "jt-actor", type: "character"});
+        defaultActor = new JTActor({name: "jt-actor", type: Object.keys(CONFIG.Actor.typeLabels)[0]});
     }
     return defaultActor;
 }
