@@ -3,7 +3,8 @@
   "version": "1.0.0",
   "description": "Display Journal Entries as Tokens",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build": "rollup --config",
+    "release": "bestzip journal-tokens.zip module assets module.json"
   },
   "repository": {
     "type": "git",
@@ -15,6 +16,7 @@
   "devDependencies": {
     "@rollup/plugin-commonjs": "^21.0.1",
     "@rollup/plugin-node-resolve": "^13.1.2",
+    "bestzip": "^2.2.0",
     "rollup": "^2.62.0"
   }
 }
