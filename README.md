@@ -11,6 +11,10 @@ aproach it much differently.
 
 For now I intend to polish this up and implement the currently [planned features](#planned-features).
 
+## Installation
+
+Manifest file: https://raw.githubusercontent.com/AnthonyRO/journal-tokens/main/module.json
+
 ## How To Use
 
 NOTE: This module requires [FVTT libWrapper](https://foundryvtt.com/packages/lib-wrapper) to work.
