@@ -2,6 +2,7 @@
   "name": "journal-tokens",
   "version": "1.0.0",
   "description": "Display Journal Entries as Tokens",
+  "download": "https://github.com/AnthonyRO/journal-tokens/releases/download/v0.0.1/journal-tokens.zip",
   "scripts": {
     "build": "rollup --config",
     "release": "bestzip journal-tokens.zip module assets module.json"
