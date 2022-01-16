@@ -1,17 +1,43 @@
 const Config = {
     ID: "journal-tokens",
     Flags: {
-        Tokens: "journal-token-entities",
-        TokenJournalFields: "token-journal-fields"
-    },
-    Hooks: {
-        CreateJT: "createJT",
-        UpdateJT: "updateJT",
-        deleteJT: "deleteJT",
-        CreateJTToken: "createJTToken",
-        UpdateJTToken: "updateJTToken"
+        JournalEntryID: "journal-entry-id",
     }
 };
+
+let defaultActor = null;
+
+class JTActor extends Actor {}
+
+function getOrCreateDefaultActor() {
+    if (!defaultActor) {
+        defaultActor = new JTActor({name: "jt-actor", type: Object.keys(CONFIG.Actor.typeLabels)[0]});
+    }
+    return defaultActor;
+}
+
+async function newJTFromJournalEntry(journalEntry) {
+    if (defaultActor === null) {
+        getOrCreateDefaultActor();
+    }
+    const td = await defaultActor.getTokenData({name: "journal-tokens-token", img: "modules/journal-tokens/assets/1x1.png"});
+    const docClass = getDocumentClass("Token");
+    const tokenDocument = await docClass.create(td, {parent: canvas.scene});
+    tokenDocument.setFlag(Config.ID, Config.Flags.JournalEntryID, journalEntry.id);
+    tokenDocument.update({name: journalEntry.data.name, displayName: 50});
+    return tokenDocument;
+}
+
+async function handleGetJournalDirectoryEntryContext(_html, contextEntries) {
+    contextEntries.push({
+        name: "to token",
+        icon: `<i class="fas fa-code"></i>`,
+        callback: async data => {
+            const journalEntry = game.journal.get(data[0].dataset.entityId || data[0].dataset.documentId);
+            newJTFromJournalEntry(journalEntry);
+        }
+    });
+}
 
 /*!
  * @pixi/constants - v6.2.1
@@ -22696,124 +22722,6 @@ var defaultDestroyOptions = {
  */
 var l=function(t){function l(r,s,h){void 0===r&&(r=""),void 0===s&&(s={}),(h=h||document.createElement("canvas")).width=3,h.height=3;var n=Texture.from(h,{scaleMode:settings.SCALE_MODE});n.orig=new Rectangle,n.trim=new Rectangle,t.call(this,n),this._parser=new DOMParser,this._image=new Image,this.canvas=h,this.context=this.canvas.getContext("2d"),this._resolution=settings.RESOLUTION,this._autoResolution=!0,this._text=null,this._style=null,this._loading=!1,this.text=r,this.style=s,this.localStyleID=-1;}t&&(l.__proto__=t),l.prototype=Object.create(t&&t.prototype),l.prototype.constructor=l;var d={width:{configurable:!0},height:{configurable:!0},style:{configurable:!0},text:{configurable:!0},resolution:{configurable:!0}};return l.prototype.updateText=function(t){var i=this,e=this.style,o=this.canvas,h=this.context,n=this.resolution;if(this.localStyleID!==e.styleID&&(this.dirty=!0,this.localStyleID=e.styleID),this.dirty||!t){var a="\n            display:inline-block;\n            color:"+e.fill+";\n            font-size: "+e.fontSize+"px;\n            font-family:"+e.fontFamily+";\n            font-weight:"+e.fontWeight+";\n            font-style:"+e.fontStyle+";\n            font-variant:"+e.fontVariant+";\n            letter-spacing:"+e.letterSpacing+"px;\n            text-align:"+e.align+";\n            padding:"+e.padding+"px;\n        ";if(e.lineHeight&&(a+="line-height:"+e.lineHeight+"px;"),e.wordWrap&&(a+="word-wrap:"+(e.breakWords?"break-all":"break-word")+";",a+="width:"+e.wordWrapWidth+"px;"),e.strokeThickness){var l=e.stroke;"number"==typeof color&&(l=hex2string(l)),a+="-webkit-text-stroke-width: "+e.strokeThickness+"px;",a+="-webkit-text-stroke-color: "+l+";",a+="text-stroke-width: "+e.strokeThickness+"px;",a+="text-stroke-color: "+l+";",a+="paint-order: stroke;";}if(e.dropShadow){var d=e.dropShadowAngle,u=e.dropShadowDistance,p=e.dropShadowBlur,c=e.dropShadowColor,g=e.dropShadowAlpha,x=Math.round(Math.cos(d)*u),f=Math.round(Math.sin(d)*u),y=c;if("number"==typeof y&&(y=hex2string(y)),"#"===y.charAt(0)&&g<1){var _=hex2rgb(parseInt(y.replace("#",""),16));y="rgba("+(255*_[0]|0)+", "+(255*_[1]|0)+", "+(255*_[2]|0)+", "+g+")";}a+="text-shadow: "+x+"px "+f+"px "+p+"px "+y+";";}var w='\n            <svg xmlns="http://www.w3.org/2000/svg" width="2048" height="2048">\n                <foreignObject width="100%" height="100%">\n                    <div xmlns="http://www.w3.org/1999/xhtml" style="'+a+'">'+this._text+"</div>\n                </foreignObject>\n            </svg>\n       ",m=this._parser.parseFromString(w,"text/xml").firstChild.querySelector("div");document.body.appendChild(m);var v=m.getBoundingClientRect(),b=v.width,S=v.height;if(document.body.removeChild(m),o.width=Math.ceil((Math.max(1,b)+2*e.padding)*n),o.height=Math.ceil((Math.max(1,S)+2*e.padding)*n),h.scale(n,n),h.clearRect(0,0,o.width,o.height),!this._loading){var k=this._image;this._loading=!0,k.src="data:image/svg+xml,"+encodeURIComponent(w),k.onload=function(){h.drawImage(k,0,0,b,S,0,0,b,S),k.onload=void 0,k.src="",i._loading=!1,i.updateTexture();},this.updateTexture();}}},l.prototype.updateTexture=function(){var t=this.canvas,i=this.context,e=this.style,o=this.texture,r=this.resolution;if(e.trim){var s=trimCanvas(t),n=s.width,a=s.height,l=s.data;l&&(t.width=n,t.height=a,i.putImageData(l,0,0));}var d=e.trim?0:e.padding,u=o.baseTexture;o.trim.width=o._frame.width=Math.ceil(t.width/r),o.trim.height=o._frame.height=Math.ceil(t.height/r),o.trim.x=-d,o.trim.y=-d,o.orig.width=o._frame.width-2*d,o.orig.height=o._frame.height-2*d,this._onTextureUpdate(),u.setRealSize(t.width,t.height,r),this.dirty=!1;},l.prototype._render=function(i){this._autoResolution&&this._resolution!==i.resolution&&(this._resolution=i.resolution,this.dirty=!0),this.updateText(!0),t.prototype._render.call(this,i);},l.prototype._renderCanvas=function(i){this._autoResolution&&this._resolution!==i.resolution&&(this._resolution=i.resolution,this.dirty=!0),this.updateText(!0),t.prototype._renderCanvas.call(this,i);},l.prototype.getLocalBounds=function(i){return this.updateText(!0),t.prototype.getLocalBounds.call(this,i)},l.prototype._calculateBounds=function(){this.updateText(!0),this.calculateVertices(),this._bounds.addQuad(this.vertexData);},l.prototype._onStyleChange=function(){this.dirty=!0;},l.prototype.destroy=function(i){void 0===i&&(i=!0),t.prototype.destroy.call(this,i),this.context=null,this.canvas.width=this.canvas.height=0,this.canvas=null,this._style=null,this._parser=null,this._image.onload=null,this._image.src="",this._image=null;},d.width.get=function(){return this.updateText(!0),Math.abs(this.scale.x)*this._texture.orig.width},d.width.set=function(t){this.updateText(!0);var i=sign(this.scale.x)||1;this.scale.x=i*t/this._texture.orig.width,this._width=t;},d.height.get=function(){return this.updateText(!0),Math.abs(this.scale.y)*this._texture.orig.height},d.height.set=function(t){this.updateText(!0);var i=sign(this.scale.y)||1;this.scale.y=i*t/this._texture.orig.height,this._height=t;},d.style.get=function(){return this._style},d.style.set=function(t){t=t||{},this._style=t instanceof TextStyle?t:new TextStyle(t),this.localStyleID=-1,this.dirty=!0;},d.text.get=function(){return this._text},d.text.set=function(t){t=String(""===t||null==t?" ":t),this._text!==t&&(this._text=t,this.dirty=!0);},d.resolution.get=function(){return this._resolution},d.resolution.set=function(t){this._autoResolution=!1,this._resolution!==t&&(this._resolution=t,this.dirty=!0);},Object.defineProperties(l.prototype,d),l}(Sprite);
 
-let defaultActor = null;
-
-class JTActor extends Actor {}
-
-function getOrCreateDefaultActor() {
-    if (!defaultActor) {
-        defaultActor = new JTActor({name: "jt-actor", type: Object.keys(CONFIG.Actor.typeLabels)[0]});
-    }
-    return defaultActor;
-}
-
-class JTManager {
-    static get allInScene() {
-        return canvas.scene.getFlag(Config.ID, Config.Flags.Tokens);
-    }
-
-    static async new(journalEntry) {
-        if (defaultActor === null) {
-            getOrCreateDefaultActor();
-        }
-        const td = await defaultActor.getTokenData({name: "journal-tokens-token", img: "modules/journal-tokens/assets/1x1.png"});
-        const docClass = getDocumentClass("Token");
-        const token = await docClass.create(td, {parent: canvas.scene});
-        const jt = {
-            id: foundry.utils.randomID(16),
-            journalId: journalEntry.id,
-            tokenId: token.id,
-            name: journalEntry.data.name,
-            content: journalEntry.data.content
-        };
-        const entry = {
-            [jt.id]: jt
-        };
-        await canvas.scene.setFlag(Config.ID, Config.Flags.Tokens, entry);
-        return jt;
-    }
-
-    static async update(jt, changes) {
-        await canvas.scene.setFlag(Config.ID, Config.Flags.Tokens, {[jt.id]: changes});
-    }
-
-    static delete(jt) {
-        canvas.scene.setFlag(Config.ID, Config.Flags.Tokens, {[`-=${jt.id}`]: null});
-    }
-
-    static getByTokenID(tokenId) {
-        for (const [jtID, jt] of Object.entries(this.allInScene)) {
-            if (jt.tokenId === tokenId) {
-                return jt;
-            }
-        }
-    }
-
-    static getAllByJournalID(journalId) {
-        const matches = [];
-        for (const [jtID, jt] of Object.entries(this.allInScene)) {
-            if (jt.journalId === journalId) {
-                matches.push(jt);
-            }
-        }
-        return matches;
-    }
-
-    static getToken(jt) {
-        return canvas.tokens.get(jt.tokenId);
-    }
-
-    static getJournal(jt) {
-        return game.journal.get(jt.journalId);
-    }
-}
-
-async function createJT(journalEntry) {
-    const jt = await JTManager.new(journalEntry);
-    JTManager.getToken(jt).document.update({name: jt.name}); // , displayName: 50});
-}
-
-Hooks.on("getJournalDirectoryEntryContext", (_html, contextEntries) => {
-    contextEntries.push({
-        name: "to token",
-        icon: `<i class="fas fa-code"></i>`,
-        callback: async data => {
-            const journalEntry = game.journal.get(data[0].dataset.entityId || data[0].dataset.documentId);
-            createJT(journalEntry);
-        }
-    });
-});
-
-function handleDeleteToken(tokenDocument, options, userId) {
-    const jt = JTManager.getByTokenID(tokenDocument.id);
-    JTManager.delete(jt);
-}
-
-Hooks.on("deleteToken", handleDeleteToken);
-
-function handleDeleteJournalEntry(journalEntry, options, userId) {
-    const forDeletion = JTManager.getAllByJournalID(journalEntry.id);
-    forDeletion.forEach((jt) => {
-        canvas.scene.setFlag(Config.ID, Config.Flags.Tokens, {[jt.id]: {journalId: ""}});
-    });
-}
-
-Hooks.on("deleteJournalEntry", handleDeleteJournalEntry);
-
-async function handleUpdateJournalEntry(journalEntry, change, options, userId) {
-    const jts = JTManager.getAllByJournalID(journalEntry.id);
-    for (const jt of jts) {
-        const update = {
-            name: change.name||journalEntry.data.name,
-            content: change.content||journalEntry.data.content
-        };
-        await JTManager.update(jt, update);
-        JTManager.getToken(jt).document.update(update);
-    }
-}
-
-Hooks.on("updateJournalEntry", handleUpdateJournalEntry);
-
 function getJournalTokenIcon(
     name,
     content,
@@ -22884,35 +22792,71 @@ function getJournalTokenIcon(
     return graphics;
 }
 
+function drawIconWrapper(wrapped, ...args) {
+    const journalEntryID = this.document.getFlag(Config.ID, Config.Flags.JournalEntryID);
+    if (journalEntryID) {
+        const journalEntry = game.journal.get(journalEntryID);
+        let icon = new PIXI.Container();
+        let graphics = getJournalTokenIcon(journalEntry.data.title, journalEntry.data.content, this.w, this.h);
+        graphics.tint = this.data.tint ? foundry.utils.colorStringToHex(this.data.tint) : 0xFFFFFF;
+        icon.addChild(graphics);
+        return icon;
+    }
+    return wrapped(...args)
+}
+
+function refreshWrapper(wrapped, ...args) {
+    let result = wrapped(...args);
+    const journalEntryID = this.document.getFlag(Config.ID, Config.Flags.JournalEntryID);
+    if (journalEntryID) {
+        const journalEntry = game.journal.get(journalEntryID);
+        let graphics = getJournalTokenIcon(journalEntry.data.name, journalEntry.data.content, this.w, this.h);
+        graphics.tint = this.data.tint ? foundry.utils.colorStringToHex(this.data.tint) : 0xFFFFFF;
+        this.icon.removeChild(...this.icon.children);
+        this.icon.addChild(graphics);
+        this.icon.setTransform(0, 0);
+    }
+    return result
+}
+
+function handleUpdateJournalEntry(journalEntry, change, options, userId) {
+    for (let tok of canvas.tokens.placeables) {
+        const journalEntryID = tok.document.getFlag(Config.ID, Config.Flags.JournalEntryID);
+        if (journalEntryID) {
+            console.log("Calling refresh on");
+            console.log(tok);
+            tok.refresh();
+        }
+    }
+}
+
+// Add "To Journal Token" button to the Journal Entry context menu [ ]
+// * Create a new Token [x]
+// * Attach Journal Entry [x]
+// * Copy default settings to new Token [ ]
+Hooks.on("getJournalDirectoryEntryContext", handleGetJournalDirectoryEntryContext);
+
+// Add "Journal Token Config" button to the Journal Entry context menu [ ]
+// * Allow modification of rendering settings [ ]
+// * Update child tokens button? [ ]
+
+// Wrap Token.prototype._drawIcon and Token.prototype.refresh to render from Journal Entry [x]
 Hooks.once("libWrapper.Ready", () => {
-	if (!game.modules.get('lib-wrapper')?.active) {
+    if (!game.modules.get('lib-wrapper')?.active) {
 		if (game.user.isGM) {
 			ui.notifications.error("Module 'journal-tokens' requires the 'libWrapper' module. Please install and activate it.");
 		}
 		return;
 	}
-    libWrapper.register(Config.ID, 'Token.prototype._drawIcon', async function (wrapped, ...args) {
-        const jt = JTManager.getByTokenID(this.id);
-        if (jt) {
-            let icon = new PIXI.Container();
-            let graphics = getJournalTokenIcon(jt.title, jt.content, this.w, this.h);
-            graphics.tint = this.data.tint ? foundry.utils.colorStringToHex(this.data.tint) : 0xFFFFFF;
-            icon.addChild(graphics);
-            return icon;
-        }
-        return wrapped(...args)
-    }, 'MIXED');
-
-    libWrapper.register(Config.ID, 'Token.prototype.refresh', async function (wrapped, ...args) {
-        const jt = JTManager.getByTokenID(this.id);
-        let result = wrapped(...args);
-        if (jt) {
-            let graphics = getJournalTokenIcon(jt.name, jt.content, this.w, this.h);
-            graphics.tint = this.data.tint ? foundry.utils.colorStringToHex(this.data.tint) : 0xFFFFFF;
-            this.icon.removeChild(...this.icon.children);
-            this.icon.addChild(graphics);
-            this.icon.setTransform(0, 0);
-        }
-        return result
-    }, 'MIXED');
+    libWrapper.register(Config.ID, 'Token.prototype._drawIcon', drawIconWrapper, 'MIXED');
+    libWrapper.register(Config.ID, 'Token.prototype.refresh', refreshWrapper, 'MIXED');
 });
+
+// Refresh Token when Journal Entry updated [x]
+Hooks.on("updateJournalEntry", handleUpdateJournalEntry);
+
+// Add "Journal Token Config" to Token Config window [ ]
+// * Allow modification of rendering settings [ ]
+// * Update defaults from token button? [ ]
+
+// Open Journal Entry when clicking on Journal Token [ ]

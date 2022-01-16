@@ -1,6 +1,6 @@
 {
   "name": "journal-tokens",
-  "version": "1.0.0",
+  "version": "0.0.2",
   "description": "Display Journal Entries as Tokens",
   "scripts": {
     "build": "rollup --config",

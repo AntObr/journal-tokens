@@ -37,19 +37,8 @@ The actual Token can be resized as with a normal token and a tint can be applied
 In no particular order the below represents the list of features planned to be
 implemented:
 
-* Copy and Paste
-* Copy and Paste between scenes
-* Global settings
-  * align
-  * fontFamily
-  * fontSize
-  * fontStyle
-  * wordBreak
-  * backgroundColor
-  * fontColor
-  * borderColor
-  * defaultTokenSize
-* Per Journal Entry settings
-  * (Same as Global settings)
-* Per Token settings
-  * (Same as Global settings)
+- [x] Copy and Paste
+- [x] Copy and Paste between scenes
+- [ ] Global settings
+- [ ] Per Journal Entry settings
+- [ ] Per Token settings

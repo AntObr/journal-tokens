@@ -2,13 +2,13 @@
     "name": "journal-tokens",
     "title": "Journal Tokens",
     "description": "Display Journal Entries as Tokens.",
-    "download": "https://github.com/AnthonyRO/journal-tokens/releases/download/v0.0.1/journal-tokens.zip",
+    "download": "https://github.com/AnthonyRO/journal-tokens/releases/download/v0.0.2/journal-tokens.zip",
     "authors": [
       {
         "name": "StubbyPigeon"
       }
     ],
-    "version": "1",
+    "version": "0.0.2",
     "minimumCoreVersion": "0.8.8",
     "esmodules": [
         "module/journal-tokens.js"
